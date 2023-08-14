@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-// NewCampaign struct for NewCampaign
+// NewCampaign
 type NewCampaign struct {
 	// A user-facing name for this campaign.
 	Name string `json:"name"`
@@ -23,7 +23,7 @@ type NewCampaign struct {
 	Description *string `json:"description,omitempty"`
 	// Timestamp when the campaign will become active.
 	StartTime *time.Time `json:"startTime,omitempty"`
-	// Timestamp the campaign will become inactive.
+	// Timestamp when the campaign will become inactive.
 	EndTime *time.Time `json:"endTime,omitempty"`
 	// Arbitrary properties associated with this campaign.
 	Attributes *map[string]interface{} `json:"attributes,omitempty"`
@@ -41,6 +41,10 @@ type NewCampaign struct {
 	Limits []LimitConfig `json:"limits"`
 	// The IDs of the [campaign groups](https://docs.talon.one/docs/product/account/managing-campaign-groups) this campaign belongs to.
 	CampaignGroups *[]int32 `json:"campaignGroups,omitempty"`
+	// A list of store IDs that you want to link to the campaign.  **Note:** Campaigns with linked store IDs will only be evaluated when there is a [customer session update](https://docs.talon.one/integration-api#tag/Customer-sessions/operation/updateCustomerSessionV2) that references a linked store.
+	LinkedStoreIds *[]int32 `json:"linkedStoreIds,omitempty"`
+	// The ID of the campaign evaluation group the campaign belongs to.
+	EvaluationGroupId *int32 `json:"evaluationGroupId,omitempty"`
 }
 
 // GetName returns the Name field value
@@ -380,6 +384,72 @@ func (o *NewCampaign) HasCampaignGroups() bool {
 // SetCampaignGroups gets a reference to the given []int32 and assigns it to the CampaignGroups field.
 func (o *NewCampaign) SetCampaignGroups(v []int32) {
 	o.CampaignGroups = &v
+}
+
+// GetLinkedStoreIds returns the LinkedStoreIds field value if set, zero value otherwise.
+func (o *NewCampaign) GetLinkedStoreIds() []int32 {
+	if o == nil || o.LinkedStoreIds == nil {
+		var ret []int32
+		return ret
+	}
+	return *o.LinkedStoreIds
+}
+
+// GetLinkedStoreIdsOk returns a tuple with the LinkedStoreIds field value if set, zero value otherwise
+// and a boolean to check if the value has been set.
+func (o *NewCampaign) GetLinkedStoreIdsOk() ([]int32, bool) {
+	if o == nil || o.LinkedStoreIds == nil {
+		var ret []int32
+		return ret, false
+	}
+	return *o.LinkedStoreIds, true
+}
+
+// HasLinkedStoreIds returns a boolean if a field has been set.
+func (o *NewCampaign) HasLinkedStoreIds() bool {
+	if o != nil && o.LinkedStoreIds != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetLinkedStoreIds gets a reference to the given []int32 and assigns it to the LinkedStoreIds field.
+func (o *NewCampaign) SetLinkedStoreIds(v []int32) {
+	o.LinkedStoreIds = &v
+}
+
+// GetEvaluationGroupId returns the EvaluationGroupId field value if set, zero value otherwise.
+func (o *NewCampaign) GetEvaluationGroupId() int32 {
+	if o == nil || o.EvaluationGroupId == nil {
+		var ret int32
+		return ret
+	}
+	return *o.EvaluationGroupId
+}
+
+// GetEvaluationGroupIdOk returns a tuple with the EvaluationGroupId field value if set, zero value otherwise
+// and a boolean to check if the value has been set.
+func (o *NewCampaign) GetEvaluationGroupIdOk() (int32, bool) {
+	if o == nil || o.EvaluationGroupId == nil {
+		var ret int32
+		return ret, false
+	}
+	return *o.EvaluationGroupId, true
+}
+
+// HasEvaluationGroupId returns a boolean if a field has been set.
+func (o *NewCampaign) HasEvaluationGroupId() bool {
+	if o != nil && o.EvaluationGroupId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetEvaluationGroupId gets a reference to the given int32 and assigns it to the EvaluationGroupId field.
+func (o *NewCampaign) SetEvaluationGroupId(v int32) {
+	o.EvaluationGroupId = &v
 }
 
 type NullableNewCampaign struct {

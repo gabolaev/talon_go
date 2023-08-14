@@ -1826,7 +1826,7 @@ in that it is Application-scoped and has a predefined payload.
 
 - You can create these notifications using the Campaign Manager.
 See [Managing notifications](https://docs.talon.one/docs/product/applications/outbound-notifications).
-- You can review the payload you will receive in the [specs](https://docs.talon.one/outbound-notifications#/paths/campaign_created/post).
+- You can review the payload you will receive in the [specs](https://docs.talon.one/outbound-notifications).
 
   - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
   - @param applicationId The ID of the Application. It is displayed in your Talon.One deployment URL.
@@ -4397,7 +4397,7 @@ Download a CSV file containing the customer sessions that match the request.
 - `profileid`: The internal ID of the customer profile.
 - `profileintegrationid`: The integration ID of the customer profile.
 - `created`: The timestamp when the session was created.
-- `state`: The [state](https://docs.talon.one/docs/dev/concepts/entities#customer-session-states) of the session.
+- `state`: The [state](https://docs.talon.one/docs/dev/concepts/entities/customer-sessions#customer-session-states) of the session.
 - `cartitems`: The cart items in the session.
 - `discounts`: The discounts in the session.
 - `total`: The total value of the session.
@@ -4597,7 +4597,7 @@ The generated file can contain the following columns:
 - `campaignid`: The ID of the campaign.
 - `couponid`: The ID of the coupon, when applicable to the effect.
 - `created`: The timestamp of the effect.
-- `event_type`: The name of the event. See the [docs](https://docs.talon.one/docs/dev/concepts/events).
+- `event_type`: The name of the event. See the [docs](https://docs.talon.one/docs/dev/concepts/entities/events).
 - `eventid`: The internal ID of the effect.
 - `name`: The effect name. See the [docs](https://docs.talon.one/docs/dev/integration-api/api-effects).
 - `profileintegrationid`: The ID of the customer profile, when applicable.
@@ -5683,6 +5683,190 @@ func (r apiExportLoyaltyLedgerRequest) Execute() (string, *_nethttp.Response, er
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type apiExportPoolGiveawaysRequest struct {
+	ctx           _context.Context
+	apiService    *ManagementApiService
+	poolId        int32
+	createdBefore *time.Time
+	createdAfter  *time.Time
+}
+
+func (r apiExportPoolGiveawaysRequest) CreatedBefore(createdBefore time.Time) apiExportPoolGiveawaysRequest {
+	r.createdBefore = &createdBefore
+	return r
+}
+
+func (r apiExportPoolGiveawaysRequest) CreatedAfter(createdAfter time.Time) apiExportPoolGiveawaysRequest {
+	r.createdAfter = &createdAfter
+	return r
+}
+
+/*
+ExportPoolGiveaways Export giveaway codes of a giveaway pool
+Download a CSV file containing the giveaway codes of a specific giveaway pool.
+
+**Tip:** If the exported CSV file is too large to view, you can [split it into multiple files](https://www.makeuseof.com/tag/how-to-split-a-huge-csv-excel-workbook-into-seperate-files/).
+
+The CSV file contains the following columns:
+
+- `id`: The internal ID of the giveaway.
+- `poolid`: The internal ID of the giveaway pool.
+- `code`: The giveaway code.
+- `startdate`: The validity start date in RFC3339 of the giveaway (can be empty).
+- `enddate`: The validity end date in RFC3339 of the giveaway (can be empty).
+- `attributes`: Any custom attributes associated with the giveaway code (can be empty).
+- `used`: An indication of whether the giveaway is already awarded.
+- `importid`: The ID of the import which created the giveaway.
+- `created`: The creation time of the giveaway code.
+- `profileintegrationid`: The third-party integration ID of the customer profile that was awarded the giveaway. Can be empty if the giveaway was not awarded.
+- `profileid`: The internal ID of the customer profile that was awarded the giveaway. Can be empty if the giveaway was not awarded or an internal ID does not exist.
+
+  - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+  - @param poolId The ID of the pool. You can find it in the Campaign Manager, in the **Giveaways** section.
+
+@return apiExportPoolGiveawaysRequest
+*/
+func (a *ManagementApiService) ExportPoolGiveaways(ctx _context.Context, poolId int32) apiExportPoolGiveawaysRequest {
+	return apiExportPoolGiveawaysRequest{
+		apiService: a,
+		ctx:        ctx,
+		poolId:     poolId,
+	}
+}
+
+/*
+Execute executes the request
+
+	@return string
+*/
+func (r apiExportPoolGiveawaysRequest) Execute() (string, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  string
+	)
+
+	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.ExportPoolGiveaways")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/v1/giveaways/pools/{poolId}/export"
+	localVarPath = strings.Replace(localVarPath, "{"+"poolId"+"}", _neturl.QueryEscape(parameterToString(r.poolId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	if r.createdBefore != nil {
+		localVarQueryParams.Add("createdBefore", parameterToString(*r.createdBefore, ""))
+	}
+	if r.createdAfter != nil {
+		localVarQueryParams.Add("createdAfter", parameterToString(*r.createdAfter, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/csv"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.ctx != nil {
+		// API Key Authentication
+		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			if auth, ok := auth["Authorization"]; ok {
+				var key string
+				if auth.Prefix != "" {
+					key = auth.Prefix + " " + auth.Key
+				} else {
+					key = auth.Key
+				}
+				localVarHeaderParams["Authorization"] = key
+			}
+		}
+	}
+	if r.ctx != nil {
+		// API Key Authentication
+		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			if auth, ok := auth["Authorization"]; ok {
+				var key string
+				if auth.Prefix != "" {
+					key = auth.Prefix + " " + auth.Key
+				} else {
+					key = auth.Key
+				}
+				localVarHeaderParams["Authorization"] = key
+			}
+		}
+	}
+	req, err := r.apiService.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := r.apiService.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 200 {
+			var v string
+			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v ErrorResponseWithStatus
+			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = r.apiService.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type apiExportReferralsRequest struct {
 	ctx           _context.Context
 	apiService    *ManagementApiService
@@ -6723,16 +6907,16 @@ func (a *ManagementApiService) GetAdditionalCosts(ctx _context.Context) apiGetAd
 /*
 Execute executes the request
 
-	@return InlineResponse20032
+	@return InlineResponse20033
 */
-func (r apiGetAdditionalCostsRequest) Execute() (InlineResponse20032, *_nethttp.Response, error) {
+func (r apiGetAdditionalCostsRequest) Execute() (InlineResponse20033, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  InlineResponse20032
+		localVarReturnValue  InlineResponse20033
 	)
 
 	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.GetAdditionalCosts")
@@ -6822,7 +7006,7 @@ func (r apiGetAdditionalCostsRequest) Execute() (InlineResponse20032, *_nethttp.
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
-			var v InlineResponse20032
+			var v InlineResponse20033
 			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -7079,16 +7263,16 @@ func (a *ManagementApiService) GetAllRoles(ctx _context.Context) apiGetAllRolesR
 /*
 Execute executes the request
 
-	@return InlineResponse20040
+	@return InlineResponse20041
 */
-func (r apiGetAllRolesRequest) Execute() (InlineResponse20040, *_nethttp.Response, error) {
+func (r apiGetAllRolesRequest) Execute() (InlineResponse20041, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  InlineResponse20040
+		localVarReturnValue  InlineResponse20041
 	)
 
 	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.GetAllRoles")
@@ -7169,7 +7353,7 @@ func (r apiGetAllRolesRequest) Execute() (InlineResponse20040, *_nethttp.Respons
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
-			var v InlineResponse20040
+			var v InlineResponse20041
 			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -8183,7 +8367,7 @@ func (r apiGetApplicationEventTypesRequest) Sort(sort string) apiGetApplicationE
 GetApplicationEventTypes List Applications event types
 Get all of the distinct values of the Event `type` property for events recorded in the application.
 
-See also: [Track an event](https://docs.talon.one/integration-api#operation/trackEvent)
+See also: [Track an event](https://docs.talon.one/integration-api#tag/Events/operation/trackEventV2)
 
   - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
   - @param applicationId The ID of the Application. It is displayed in your Talon.One deployment URL.
@@ -10643,16 +10827,16 @@ func (a *ManagementApiService) GetChanges(ctx _context.Context) apiGetChangesReq
 /*
 Execute executes the request
 
-	@return InlineResponse20038
+	@return InlineResponse20039
 */
-func (r apiGetChangesRequest) Execute() (InlineResponse20038, *_nethttp.Response, error) {
+func (r apiGetChangesRequest) Execute() (InlineResponse20039, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  InlineResponse20038
+		localVarReturnValue  InlineResponse20039
 	)
 
 	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.GetChanges")
@@ -10766,7 +10950,7 @@ func (r apiGetChangesRequest) Execute() (InlineResponse20038, *_nethttp.Response
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
-			var v InlineResponse20038
+			var v InlineResponse20039
 			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -12488,16 +12672,16 @@ func (a *ManagementApiService) GetEventTypes(ctx _context.Context) apiGetEventTy
 /*
 Execute executes the request
 
-	@return InlineResponse20036
+	@return InlineResponse20037
 */
-func (r apiGetEventTypesRequest) Execute() (InlineResponse20036, *_nethttp.Response, error) {
+func (r apiGetEventTypesRequest) Execute() (InlineResponse20037, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  InlineResponse20036
+		localVarReturnValue  InlineResponse20037
 	)
 
 	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.GetEventTypes")
@@ -12593,7 +12777,7 @@ func (r apiGetEventTypesRequest) Execute() (InlineResponse20036, *_nethttp.Respo
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
-			var v InlineResponse20036
+			var v InlineResponse20037
 			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -12669,16 +12853,16 @@ func (a *ManagementApiService) GetExports(ctx _context.Context) apiGetExportsReq
 /*
 Execute executes the request
 
-	@return InlineResponse20039
+	@return InlineResponse20040
 */
-func (r apiGetExportsRequest) Execute() (InlineResponse20039, *_nethttp.Response, error) {
+func (r apiGetExportsRequest) Execute() (InlineResponse20040, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  InlineResponse20039
+		localVarReturnValue  InlineResponse20040
 	)
 
 	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.GetExports")
@@ -12774,7 +12958,7 @@ func (r apiGetExportsRequest) Execute() (InlineResponse20039, *_nethttp.Response
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
-			var v InlineResponse20039
+			var v InlineResponse20040
 			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -13013,7 +13197,7 @@ func (r apiGetLoyaltyCardTransactionLogsRequest) SubledgerId(subledgerId string)
 
 /*
 GetLoyaltyCardTransactionLogs List card's transactions
-Retrieve the transaction logs for the given [loyalty card](https://docs.talon.one/docs/product/loyalty-programs/loyalty-cards/loyalty-card-overview)
+Retrieve the transaction logs for the given [loyalty card](https://docs.talon.one/docs/product/loyalty-programs/card-based/card-based-overview)
 within the specified [card-based loyalty program](https://docs.talon.one/docs/product/loyalty-programs/overview#loyalty-program-types) with filtering options applied.
 If no filtering options are applied, the last 50 loyalty transactions for the given loyalty card are returned.
 
@@ -14714,10 +14898,10 @@ type apiGetRoleRequest struct {
 
 /*
 GetRole Get role
-Get the details of the specified role. To see all the roles, use [List roles](#operation/getAllRoles).
+Get the details of a specific role. To see all the roles, use [List roles](#operation/getAllRoles).
 
   - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-  - @param roleId The Id of role.
+  - @param roleId The ID of role.
 
 @return apiGetRoleRequest
 */
@@ -15347,16 +15531,16 @@ func (a *ManagementApiService) GetUsers(ctx _context.Context) apiGetUsersRequest
 /*
 Execute executes the request
 
-	@return InlineResponse20037
+	@return InlineResponse20038
 */
-func (r apiGetUsersRequest) Execute() (InlineResponse20037, *_nethttp.Response, error) {
+func (r apiGetUsersRequest) Execute() (InlineResponse20038, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  InlineResponse20037
+		localVarReturnValue  InlineResponse20038
 	)
 
 	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.GetUsers")
@@ -15446,7 +15630,7 @@ func (r apiGetUsersRequest) Execute() (InlineResponse20037, *_nethttp.Response, 
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
-			var v InlineResponse20037
+			var v InlineResponse20038
 			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -15686,16 +15870,16 @@ func (a *ManagementApiService) GetWebhookActivationLogs(ctx _context.Context) ap
 /*
 Execute executes the request
 
-	@return InlineResponse20034
+	@return InlineResponse20035
 */
-func (r apiGetWebhookActivationLogsRequest) Execute() (InlineResponse20034, *_nethttp.Response, error) {
+func (r apiGetWebhookActivationLogsRequest) Execute() (InlineResponse20035, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  InlineResponse20034
+		localVarReturnValue  InlineResponse20035
 	)
 
 	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.GetWebhookActivationLogs")
@@ -15803,7 +15987,7 @@ func (r apiGetWebhookActivationLogsRequest) Execute() (InlineResponse20034, *_ne
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
-			var v InlineResponse20034
+			var v InlineResponse20035
 			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -15908,16 +16092,16 @@ func (a *ManagementApiService) GetWebhookLogs(ctx _context.Context) apiGetWebhoo
 /*
 Execute executes the request
 
-	@return InlineResponse20035
+	@return InlineResponse20036
 */
-func (r apiGetWebhookLogsRequest) Execute() (InlineResponse20035, *_nethttp.Response, error) {
+func (r apiGetWebhookLogsRequest) Execute() (InlineResponse20036, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  InlineResponse20035
+		localVarReturnValue  InlineResponse20036
 	)
 
 	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.GetWebhookLogs")
@@ -16028,7 +16212,7 @@ func (r apiGetWebhookLogsRequest) Execute() (InlineResponse20035, *_nethttp.Resp
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
-			var v InlineResponse20035
+			var v InlineResponse20036
 			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -16052,12 +16236,16 @@ func (r apiGetWebhookLogsRequest) Execute() (InlineResponse20035, *_nethttp.Resp
 }
 
 type apiGetWebhooksRequest struct {
-	ctx            _context.Context
-	apiService     *ManagementApiService
-	applicationIds *string
-	sort           *string
-	pageSize       *int32
-	skip           *int32
+	ctx                        _context.Context
+	apiService                 *ManagementApiService
+	applicationIds             *string
+	sort                       *string
+	pageSize                   *int32
+	skip                       *int32
+	creationType               *string
+	visibility                 *string
+	outgoingIntegrationsTypeId *int32
+	title                      *string
 }
 
 func (r apiGetWebhooksRequest) ApplicationIds(applicationIds string) apiGetWebhooksRequest {
@@ -16080,6 +16268,26 @@ func (r apiGetWebhooksRequest) Skip(skip int32) apiGetWebhooksRequest {
 	return r
 }
 
+func (r apiGetWebhooksRequest) CreationType(creationType string) apiGetWebhooksRequest {
+	r.creationType = &creationType
+	return r
+}
+
+func (r apiGetWebhooksRequest) Visibility(visibility string) apiGetWebhooksRequest {
+	r.visibility = &visibility
+	return r
+}
+
+func (r apiGetWebhooksRequest) OutgoingIntegrationsTypeId(outgoingIntegrationsTypeId int32) apiGetWebhooksRequest {
+	r.outgoingIntegrationsTypeId = &outgoingIntegrationsTypeId
+	return r
+}
+
+func (r apiGetWebhooksRequest) Title(title string) apiGetWebhooksRequest {
+	r.title = &title
+	return r
+}
+
 /*
 GetWebhooks List webhooks
 List all webhooks.
@@ -16097,16 +16305,16 @@ func (a *ManagementApiService) GetWebhooks(ctx _context.Context) apiGetWebhooksR
 /*
 Execute executes the request
 
-	@return InlineResponse20033
+	@return InlineResponse20034
 */
-func (r apiGetWebhooksRequest) Execute() (InlineResponse20033, *_nethttp.Response, error) {
+func (r apiGetWebhooksRequest) Execute() (InlineResponse20034, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  InlineResponse20033
+		localVarReturnValue  InlineResponse20034
 	)
 
 	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.GetWebhooks")
@@ -16131,6 +16339,18 @@ func (r apiGetWebhooksRequest) Execute() (InlineResponse20033, *_nethttp.Respons
 	}
 	if r.skip != nil {
 		localVarQueryParams.Add("skip", parameterToString(*r.skip, ""))
+	}
+	if r.creationType != nil {
+		localVarQueryParams.Add("creationType", parameterToString(*r.creationType, ""))
+	}
+	if r.visibility != nil {
+		localVarQueryParams.Add("visibility", parameterToString(*r.visibility, ""))
+	}
+	if r.outgoingIntegrationsTypeId != nil {
+		localVarQueryParams.Add("outgoingIntegrationsTypeId", parameterToString(*r.outgoingIntegrationsTypeId, ""))
+	}
+	if r.title != nil {
+		localVarQueryParams.Add("title", parameterToString(*r.title, ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -16199,7 +16419,7 @@ func (r apiGetWebhooksRequest) Execute() (InlineResponse20033, *_nethttp.Respons
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
-			var v InlineResponse20033
+			var v InlineResponse20034
 			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -17161,6 +17381,211 @@ func (r apiImportLoyaltyCardsRequest) Execute() (Import, *_nethttp.Response, err
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type apiImportLoyaltyCustomersTiersRequest struct {
+	ctx              _context.Context
+	apiService       *ManagementApiService
+	loyaltyProgramId int32
+	upFile           *string
+}
+
+func (r apiImportLoyaltyCustomersTiersRequest) UpFile(upFile string) apiImportLoyaltyCustomersTiersRequest {
+	r.upFile = &upFile
+	return r
+}
+
+/*
+ImportLoyaltyCustomersTiers Import customers into loyalty tiers
+Upload a CSV file containing existing customers to be assigned to existing tiers.
+Send the file as multipart data.
+
+**Important:** This endpoint only works with loyalty programs with advanced tiers (with expiration and downgrade policy) feature enabled.
+
+The CSV file should contain the following columns:
+- `subledgerid` (optional): The ID of the subledger. If this field is empty, the main ledger will be used.
+- `customerprofileid`: The integration ID of the customer profile to whom the tier should be assigned.
+- `tiername`: The name of an existing tier to assign to the customer.
+- `expirydate`: The expiration date of the tier. It should be a future date.
+
+About customer assignment to a tier:
+- If the customer isn't already in a tier, the customer is assigned to the specified tier during the tier import.
+- If the customer is already in a tier, the customer is assigned to match the new information provided in the CSV file.
+- If the customer is already in the tier that's specified in the CSV file, only the expiration date is updated.
+
+You can use the time zone of your choice. It is converted to UTC internally by Talon.One.
+
+**Note:** We recommend limiting your file size to 500MB.
+
+**Example:**
+```csv
+subledgerid,customerprofileid,tiername,expirydate
+SUB1,alexa,Gold,2024-03-21T07:32:14Z
+,george,Silver,2025-04-16T21:12:37Z
+SUB2,avocado,Bronze,2026-05-03T11:47:01Z
+```
+
+  - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+  - @param loyaltyProgramId Identifier of the card-based loyalty program containing the loyalty card. You can get the ID with the [List loyalty programs](https://docs.talon.one/management-api#tag/Loyalty/operation/getLoyaltyPrograms) endpoint.
+
+@return apiImportLoyaltyCustomersTiersRequest
+*/
+func (a *ManagementApiService) ImportLoyaltyCustomersTiers(ctx _context.Context, loyaltyProgramId int32) apiImportLoyaltyCustomersTiersRequest {
+	return apiImportLoyaltyCustomersTiersRequest{
+		apiService:       a,
+		ctx:              ctx,
+		loyaltyProgramId: loyaltyProgramId,
+	}
+}
+
+/*
+Execute executes the request
+
+	@return Import
+*/
+func (r apiImportLoyaltyCustomersTiersRequest) Execute() (Import, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  Import
+	)
+
+	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.ImportLoyaltyCustomersTiers")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/v1/loyalty_programs/{loyaltyProgramId}/import_customers_tiers"
+	localVarPath = strings.Replace(localVarPath, "{"+"loyaltyProgramId"+"}", _neturl.QueryEscape(parameterToString(r.loyaltyProgramId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"multipart/form-data"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.upFile != nil {
+		localVarFormParams.Add("upFile", parameterToString(*r.upFile, ""))
+	}
+	if r.ctx != nil {
+		// API Key Authentication
+		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			if auth, ok := auth["Authorization"]; ok {
+				var key string
+				if auth.Prefix != "" {
+					key = auth.Prefix + " " + auth.Key
+				} else {
+					key = auth.Key
+				}
+				localVarHeaderParams["Authorization"] = key
+			}
+		}
+	}
+	if r.ctx != nil {
+		// API Key Authentication
+		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			if auth, ok := auth["Authorization"]; ok {
+				var key string
+				if auth.Prefix != "" {
+					key = auth.Prefix + " " + auth.Key
+				} else {
+					key = auth.Key
+				}
+				localVarHeaderParams["Authorization"] = key
+			}
+		}
+	}
+	req, err := r.apiService.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := r.apiService.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 200 {
+			var v Import
+			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v ErrorResponseWithStatus
+			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v ErrorResponseWithStatus
+			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v ErrorResponseWithStatus
+			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = r.apiService.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type apiImportLoyaltyPointsRequest struct {
 	ctx              _context.Context
 	apiService       *ManagementApiService
@@ -17185,8 +17610,14 @@ The CSV file contains the following columns:
 - `customerprofileid` (optional): For profile-based loyalty programs, the integration ID of the customer profile where the loyalty points are imported.
 - `identifier` (optional): For card-based loyalty programs, the identifier of the loyalty card where the loyalty points are imported.
 - `amount`: The amount of points to award to the customer profile.
-- `startdate`: The earliest date when the points can be redeemed. On this date and until the expiration date, the points are `active`.
-- `expirydate`: The latest date when the points can be redeemed. After this date, the points are `expired`.
+- `startdate` (optional): The earliest date when the points can be redeemed. The points are `active` from this date until the expiration date.
+
+	**Note**: It must be an RFC3339 timestamp string or string `immediate`. Empty or missing values are considered `immediate`.
+
+- `expirydate` (optional): The latest date when the points can be redeemed. The points are `expired` after this date.
+
+	**Note**: It must be an RFC3339 timestamp string or string `unlimited`. Empty or missing values are considered `unlimited`.
+
 - `subledgerid` (optional): The ID of the subledger that should received the points.
 - `reason` (optional): The reason why these points are awarded.
 
@@ -17904,6 +18335,182 @@ func (r apiListAccountCollectionsRequest) Execute() (InlineResponse20015, *_neth
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type apiListCatalogItemsRequest struct {
+	ctx                 _context.Context
+	apiService          *ManagementApiService
+	catalogId           int32
+	pageSize            *int32
+	skip                *int32
+	withTotalResultSize *bool
+	sku                 *string
+}
+
+func (r apiListCatalogItemsRequest) PageSize(pageSize int32) apiListCatalogItemsRequest {
+	r.pageSize = &pageSize
+	return r
+}
+
+func (r apiListCatalogItemsRequest) Skip(skip int32) apiListCatalogItemsRequest {
+	r.skip = &skip
+	return r
+}
+
+func (r apiListCatalogItemsRequest) WithTotalResultSize(withTotalResultSize bool) apiListCatalogItemsRequest {
+	r.withTotalResultSize = &withTotalResultSize
+	return r
+}
+
+func (r apiListCatalogItemsRequest) Sku(sku string) apiListCatalogItemsRequest {
+	r.sku = &sku
+	return r
+}
+
+/*
+ListCatalogItems List items in a catalog
+Return a paginated list of cart items in the given catalog.
+
+  - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+  - @param catalogId The ID of the catalog. You can find the ID in the Campaign Manager in **Account** > **Tools** > **Cart item catalogs**.
+
+@return apiListCatalogItemsRequest
+*/
+func (a *ManagementApiService) ListCatalogItems(ctx _context.Context, catalogId int32) apiListCatalogItemsRequest {
+	return apiListCatalogItemsRequest{
+		apiService: a,
+		ctx:        ctx,
+		catalogId:  catalogId,
+	}
+}
+
+/*
+Execute executes the request
+
+	@return InlineResponse20032
+*/
+func (r apiListCatalogItemsRequest) Execute() (InlineResponse20032, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  InlineResponse20032
+	)
+
+	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.ListCatalogItems")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/v1/catalogs/{catalogId}/items"
+	localVarPath = strings.Replace(localVarPath, "{"+"catalogId"+"}", _neturl.QueryEscape(parameterToString(r.catalogId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	if r.pageSize != nil {
+		localVarQueryParams.Add("pageSize", parameterToString(*r.pageSize, ""))
+	}
+	if r.skip != nil {
+		localVarQueryParams.Add("skip", parameterToString(*r.skip, ""))
+	}
+	if r.withTotalResultSize != nil {
+		localVarQueryParams.Add("withTotalResultSize", parameterToString(*r.withTotalResultSize, ""))
+	}
+	if r.sku != nil {
+		localVarQueryParams.Add("sku", parameterToString(*r.sku, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.ctx != nil {
+		// API Key Authentication
+		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			if auth, ok := auth["Authorization"]; ok {
+				var key string
+				if auth.Prefix != "" {
+					key = auth.Prefix + " " + auth.Key
+				} else {
+					key = auth.Key
+				}
+				localVarHeaderParams["Authorization"] = key
+			}
+		}
+	}
+	if r.ctx != nil {
+		// API Key Authentication
+		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			if auth, ok := auth["Authorization"]; ok {
+				var key string
+				if auth.Prefix != "" {
+					key = auth.Prefix + " " + auth.Key
+				} else {
+					key = auth.Key
+				}
+				localVarHeaderParams["Authorization"] = key
+			}
+		}
+	}
+	req, err := r.apiService.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := r.apiService.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 200 {
+			var v InlineResponse20032
+			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = r.apiService.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type apiListCollectionsRequest struct {
 	ctx                 _context.Context
 	apiService          *ManagementApiService
@@ -18296,6 +18903,138 @@ func (r apiListCollectionsInApplicationRequest) Execute() (InlineResponse20017, 
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type apiNotificationActivationRequest struct {
+	ctx            _context.Context
+	apiService     *ManagementApiService
+	notificationId int32
+	body           *NotificationActivation
+}
+
+func (r apiNotificationActivationRequest) Body(body NotificationActivation) apiNotificationActivationRequest {
+	r.body = &body
+	return r
+}
+
+/*
+NotificationActivation Activate or deactivate notification
+Activate or deactivate the given notification.
+When `enabled` is false, updates will no longer be sent for the given notification.
+
+  - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+  - @param notificationId The ID of the notification. Get it with the appropriate _List notifications_ endpoint.
+
+@return apiNotificationActivationRequest
+*/
+func (a *ManagementApiService) NotificationActivation(ctx _context.Context, notificationId int32) apiNotificationActivationRequest {
+	return apiNotificationActivationRequest{
+		apiService:     a,
+		ctx:            ctx,
+		notificationId: notificationId,
+	}
+}
+
+/*
+Execute executes the request
+*/
+func (r apiNotificationActivationRequest) Execute() (*_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodPut
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+	)
+
+	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.NotificationActivation")
+	if err != nil {
+		return nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/v1/notifications/{notificationId}/activation"
+	localVarPath = strings.Replace(localVarPath, "{"+"notificationId"+"}", _neturl.QueryEscape(parameterToString(r.notificationId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	if r.body == nil {
+		return nil, reportError("body is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.body
+	if r.ctx != nil {
+		// API Key Authentication
+		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			if auth, ok := auth["Authorization"]; ok {
+				var key string
+				if auth.Prefix != "" {
+					key = auth.Prefix + " " + auth.Key
+				} else {
+					key = auth.Key
+				}
+				localVarHeaderParams["Authorization"] = key
+			}
+		}
+	}
+	if r.ctx != nil {
+		// API Key Authentication
+		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			if auth, ok := auth["Authorization"]; ok {
+				var key string
+				if auth.Prefix != "" {
+					key = auth.Prefix + " " + auth.Key
+				} else {
+					key = auth.Key
+				}
+				localVarHeaderParams["Authorization"] = key
+			}
+		}
+	}
+	req, err := r.apiService.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := r.apiService.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type apiPostAddedDeductedPointsNotificationRequest struct {
 	ctx              _context.Context
 	apiService       *ManagementApiService
@@ -18314,10 +19053,10 @@ Create a notification about added or deducted loyalty points in a given profile-
 A notification for added or deducted loyalty points is different from regular webhooks
 in that it is loyalty program-scoped and has a predefined payload.
 
-For more information, see [Managing notifications](https://docs.talon.one/docs/product/loyalty-programs/managing-notifications).
+For more information, see [Managing loyalty notifications](https://docs.talon.one/docs/product/loyalty-programs/profile-based/managing-loyalty-notifications).
 
   - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-  - @param loyaltyProgramId Identifier of the card-based loyalty program containing the loyalty card. You can get the ID with the [List loyalty programs](https://docs.talon.one/management-api#tag/Loyalty/operation/getLoyaltyPrograms) endpoint.
+  - @param loyaltyProgramId Identifier of the profile-based loyalty program. You can get the ID with the [List loyalty programs](https://docs.talon.one/management-api#tag/Loyalty/operation/getLoyaltyPrograms) endpoint.
 
 @return apiPostAddedDeductedPointsNotificationRequest
 */
@@ -18667,6 +19406,188 @@ func (r apiPostCatalogsStrikethroughNotificationRequest) Execute() (BaseNotifica
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type apiPostPendingPointsNotificationRequest struct {
+	ctx              _context.Context
+	apiService       *ManagementApiService
+	loyaltyProgramId int32
+	body             *NewBaseNotification
+}
+
+func (r apiPostPendingPointsNotificationRequest) Body(body NewBaseNotification) apiPostPendingPointsNotificationRequest {
+	r.body = &body
+	return r
+}
+
+/*
+PostPendingPointsNotification Create notification about pending loyalty points
+Create a notification about pending loyalty points for a given profile-based loyalty program. For more information, see [Managing loyalty notifications](https://docs.talon.one/docs/product/loyalty-programs/profile-based/managing-loyalty-notifications).
+
+  - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+  - @param loyaltyProgramId Identifier of the profile-based loyalty program. You can get the ID with the [List loyalty programs](https://docs.talon.one/management-api#tag/Loyalty/operation/getLoyaltyPrograms) endpoint.
+
+@return apiPostPendingPointsNotificationRequest
+*/
+func (a *ManagementApiService) PostPendingPointsNotification(ctx _context.Context, loyaltyProgramId int32) apiPostPendingPointsNotificationRequest {
+	return apiPostPendingPointsNotificationRequest{
+		apiService:       a,
+		ctx:              ctx,
+		loyaltyProgramId: loyaltyProgramId,
+	}
+}
+
+/*
+Execute executes the request
+
+	@return BaseNotification
+*/
+func (r apiPostPendingPointsNotificationRequest) Execute() (BaseNotification, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  BaseNotification
+	)
+
+	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "ManagementApiService.PostPendingPointsNotification")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/v1/loyalty_programs/{loyaltyProgramId}/notifications/pending_points"
+	localVarPath = strings.Replace(localVarPath, "{"+"loyaltyProgramId"+"}", _neturl.QueryEscape(parameterToString(r.loyaltyProgramId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	if r.body == nil {
+		return localVarReturnValue, nil, reportError("body is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.body
+	if r.ctx != nil {
+		// API Key Authentication
+		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			if auth, ok := auth["Authorization"]; ok {
+				var key string
+				if auth.Prefix != "" {
+					key = auth.Prefix + " " + auth.Key
+				} else {
+					key = auth.Key
+				}
+				localVarHeaderParams["Authorization"] = key
+			}
+		}
+	}
+	if r.ctx != nil {
+		// API Key Authentication
+		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			if auth, ok := auth["Authorization"]; ok {
+				var key string
+				if auth.Prefix != "" {
+					key = auth.Prefix + " " + auth.Key
+				} else {
+					key = auth.Key
+				}
+				localVarHeaderParams["Authorization"] = key
+			}
+		}
+	}
+	req, err := r.apiService.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := r.apiService.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 200 {
+			var v BaseNotification
+			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v ErrorResponseWithStatus
+			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v ErrorResponseWithStatus
+			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v ErrorResponseWithStatus
+			err = r.apiService.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = r.apiService.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type apiRemoveLoyaltyPointsRequest struct {
 	ctx              _context.Context
 	apiService       *ManagementApiService
@@ -18683,6 +19604,10 @@ func (r apiRemoveLoyaltyPointsRequest) Body(body DeductLoyaltyPoints) apiRemoveL
 /*
 RemoveLoyaltyPoints Deduct points from customer profile
 Deduct points from the specified loyalty program and specified customer profile.
+
+**Important:**
+- Only active points can be deducted.
+- Only pending points are rolled back when a session is cancelled or reopened.
 
 To get the `integrationId` of the profile from a `sessionId`, use the
 [Update customer session](https://docs.talon.one/integration-api#operation/updateCustomerSessionV2) endpoint.
@@ -19895,7 +20820,7 @@ func (r apiUpdateAdditionalCostRequest) Body(body NewAdditionalCost) apiUpdateAd
 
 /*
 UpdateAdditionalCost Update additional cost
-Updates an existing additional cost. Once created, the only property of an additional cost that can be changed is the title (human readable description). This restriction is in place to prevent accidentally breaking live integrations.
+Updates an existing additional cost. Once created, the only property of an additional cost that cannot be changed is the `name` property (or **API name** in the Campaign Manager). This restriction is in place to prevent accidentally breaking live integrations.
 
   - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
   - @param additionalCostId The ID of the additional cost. You can find the ID the the Campaign Manager's URL when you display the details of the cost in **Account** > **Tools** > **Additional costs**.
@@ -20697,7 +21622,7 @@ func (r apiUpdateCouponBatchRequest) Body(body UpdateCouponBatch) apiUpdateCoupo
 
 /*
 UpdateCouponBatch Update coupons
-Update all coupons, or a specific batch of coupons, in a campaign.
+Update all coupons, or a specific batch of coupons in the given campaign.
 You can find the `batchId` in the **Coupons** view of your Application
 in the Campaign Manager, or you can use [List coupons](#operation/getCouponsWithoutTotalCount).
 
@@ -21039,7 +21964,7 @@ UpdateNotificationWebhook Update notification about campaign-related changes
 Update the given
 [notification about campaign-related changes](https://docs.talon.one/docs/product/applications/outbound-notifications).
 
-**Tip:** You can review the payload you will receive in the [specs](https://docs.talon.one/outbound-notifications#/paths/campaign_edited/post).
+**Tip:** You can review the payload you will receive in the [specs](https://docs.talon.one/outbound-notifications).
 
   - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
   - @param applicationId The ID of the Application. It is displayed in your Talon.One deployment URL.

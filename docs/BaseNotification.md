@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Policy** | Pointer to [**map[string]interface{}**](.md) |  | 
+**Enabled** | Pointer to **bool** | Indicates whether the notification is activated. | [optional] [default to true]
 **Webhook** | Pointer to [**BaseNotificationWebhook**](BaseNotificationWebhook.md) |  | 
 **Id** | Pointer to **int32** | Unique ID for this entity. | 
 
@@ -34,6 +35,31 @@ HasPolicy returns a boolean if a field has been set.
 `func (o *BaseNotification) SetPolicy(v map[string]interface{})`
 
 SetPolicy gets a reference to the given map[string]interface{} and assigns it to the Policy field.
+
+### GetEnabled
+
+`func (o *BaseNotification) GetEnabled() bool`
+
+GetEnabled returns the Enabled field if non-nil, zero value otherwise.
+
+### GetEnabledOk
+
+`func (o *BaseNotification) GetEnabledOk() (bool, bool)`
+
+GetEnabledOk returns a tuple with the Enabled field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### HasEnabled
+
+`func (o *BaseNotification) HasEnabled() bool`
+
+HasEnabled returns a boolean if a field has been set.
+
+### SetEnabled
+
+`func (o *BaseNotification) SetEnabled(v bool)`
+
+SetEnabled gets a reference to the given bool and assigns it to the Enabled field.
 
 ### GetWebhook
 

@@ -29,7 +29,7 @@ type UpdateCampaign struct {
 	Attributes *map[string]interface{} `json:"attributes,omitempty"`
 	// A disabled or archived campaign is not evaluated for rules or coupons.
 	State *string `json:"state,omitempty"`
-	// ID of Ruleset this campaign applies on customer session evaluation.
+	// [ID of Ruleset](https://docs.talon.one/management-api#operation/getRulesets) this campaign applies on customer session evaluation.
 	ActiveRulesetId *int32 `json:"activeRulesetId,omitempty"`
 	// A list of tags for the campaign.
 	Tags []string `json:"tags"`
@@ -39,8 +39,10 @@ type UpdateCampaign struct {
 	ReferralSettings *CodeGeneratorSettings `json:"referralSettings,omitempty"`
 	// The set of limits that will operate for this campaign.
 	Limits []LimitConfig `json:"limits"`
-	// The IDs of the campaign groups that own this entity.
+	// The IDs of the [campaign groups](https://docs.talon.one/docs/product/account/account-settings/managing-campaign-groups) this campaign belongs to.
 	CampaignGroups *[]int32 `json:"campaignGroups,omitempty"`
+	// A list of store IDs that you want to link to the campaign.  **Note:** Campaigns with linked store IDs will only be evaluated when there is a [customer session update](https://docs.talon.one/integration-api#tag/Customer-sessions/operation/updateCustomerSessionV2) that references a linked store.
+	LinkedStoreIds *[]int32 `json:"linkedStoreIds,omitempty"`
 }
 
 // GetName returns the Name field value
@@ -398,6 +400,39 @@ func (o *UpdateCampaign) HasCampaignGroups() bool {
 // SetCampaignGroups gets a reference to the given []int32 and assigns it to the CampaignGroups field.
 func (o *UpdateCampaign) SetCampaignGroups(v []int32) {
 	o.CampaignGroups = &v
+}
+
+// GetLinkedStoreIds returns the LinkedStoreIds field value if set, zero value otherwise.
+func (o *UpdateCampaign) GetLinkedStoreIds() []int32 {
+	if o == nil || o.LinkedStoreIds == nil {
+		var ret []int32
+		return ret
+	}
+	return *o.LinkedStoreIds
+}
+
+// GetLinkedStoreIdsOk returns a tuple with the LinkedStoreIds field value if set, zero value otherwise
+// and a boolean to check if the value has been set.
+func (o *UpdateCampaign) GetLinkedStoreIdsOk() ([]int32, bool) {
+	if o == nil || o.LinkedStoreIds == nil {
+		var ret []int32
+		return ret, false
+	}
+	return *o.LinkedStoreIds, true
+}
+
+// HasLinkedStoreIds returns a boolean if a field has been set.
+func (o *UpdateCampaign) HasLinkedStoreIds() bool {
+	if o != nil && o.LinkedStoreIds != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetLinkedStoreIds gets a reference to the given []int32 and assigns it to the LinkedStoreIds field.
+func (o *UpdateCampaign) SetLinkedStoreIds(v []int32) {
+	o.LinkedStoreIds = &v
 }
 
 type NullableUpdateCampaign struct {

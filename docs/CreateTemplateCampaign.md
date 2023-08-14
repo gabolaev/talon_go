@@ -10,8 +10,9 @@ Name | Type | Description | Notes
 **CampaignAttributesOverrides** | Pointer to [**map[string]interface{}**](.md) | Custom Campaign Attributes. If the Campaign Template defines the same values, they will be overridden. | [optional] 
 **TemplateParamValues** | Pointer to [**[]Binding**](Binding.md) | Actual values to replace the template placeholder values in the Ruleset bindings. Values for all Template Parameters must be provided. | [optional] 
 **LimitOverrides** | Pointer to [**[]LimitConfig**](LimitConfig.md) | Limits for this Campaign. If the Campaign Template or Application define default values for the same limits, they will be overridden. | [optional] 
-**CampaignGroups** | Pointer to **[]int32** | The IDs of the [campaign groups](https://docs.talon.one/docs/product/account/managing-campaign-groups) this campaign belongs to.  | [optional] 
+**CampaignGroups** | Pointer to **[]int32** | The IDs of the [campaign groups](https://docs.talon.one/docs/product/account/account-settings/managing-campaign-groups) this campaign belongs to.  | [optional] 
 **Tags** | Pointer to **[]string** | A list of tags for the campaign. If the campaign template has tags, they will be overridden by this list. | [optional] 
+**EvaluationGroupId** | Pointer to **int32** | The ID of the campaign evaluation group the campaign belongs to. | [optional] 
 
 ## Methods
 
@@ -214,6 +215,31 @@ HasTags returns a boolean if a field has been set.
 `func (o *CreateTemplateCampaign) SetTags(v []string)`
 
 SetTags gets a reference to the given []string and assigns it to the Tags field.
+
+### GetEvaluationGroupId
+
+`func (o *CreateTemplateCampaign) GetEvaluationGroupId() int32`
+
+GetEvaluationGroupId returns the EvaluationGroupId field if non-nil, zero value otherwise.
+
+### GetEvaluationGroupIdOk
+
+`func (o *CreateTemplateCampaign) GetEvaluationGroupIdOk() (int32, bool)`
+
+GetEvaluationGroupIdOk returns a tuple with the EvaluationGroupId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### HasEvaluationGroupId
+
+`func (o *CreateTemplateCampaign) HasEvaluationGroupId() bool`
+
+HasEvaluationGroupId returns a boolean if a field has been set.
+
+### SetEvaluationGroupId
+
+`func (o *CreateTemplateCampaign) SetEvaluationGroupId(v int32)`
+
+SetEvaluationGroupId gets a reference to the given int32 and assigns it to the EvaluationGroupId field.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
